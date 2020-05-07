@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "758bcce2bb5a269ef130c1626bca7ea3",
+    "content-hash": "eea1e68dbefeb391b8f386d82459db99",
     "packages": [
         {
             "name": "blesta/composer-installer",
@@ -184,16 +184,16 @@
         },
         {
             "name": "stripe/stripe-php",
-            "version": "v7.29.0",
+            "version": "v7.31.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/stripe/stripe-php.git",
-                "reference": "657c8ec888d8bcb58dd8f4fa227809108b406a44"
+                "reference": "993b58f73572b415c476548134e71e07d96ac3f0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/657c8ec888d8bcb58dd8f4fa227809108b406a44",
-                "reference": "657c8ec888d8bcb58dd8f4fa227809108b406a44",
+                "url": "https://api.github.com/repos/stripe/stripe-php/zipball/993b58f73572b415c476548134e71e07d96ac3f0",
+                "reference": "993b58f73572b415c476548134e71e07d96ac3f0",
                 "shasum": ""
             },
             "require": {
@@ -237,7 +237,7 @@
                 "payment processing",
                 "stripe"
             ],
-            "time": "2020-04-22T19:35:10+00:00"
+            "time": "2020-05-01T19:45:41+00:00"
         }
     ],
     "packages-dev": [],
