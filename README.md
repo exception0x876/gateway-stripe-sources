@@ -1,4 +1,4 @@
-# Alipay Gateway
+# Stripe WeChat/Alipay Gateway
 This is a nonmerchant gateway for Blesta that integrates with [Alipay](https://global.alipay.com/) and WeChat Pay via stripe.
 
 ## Install the Gateway
