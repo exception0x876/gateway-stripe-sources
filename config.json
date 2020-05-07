@@ -1,0 +1,23 @@
+{
+	"version": "1.0.0",
+	"name": "StripeSources.name",
+	"description": "StripeSources.description",
+	"authors": [
+		{
+			"name": "Kieran Coldron",
+			"url": "http://www.blesta.com"
+		}
+	],
+	"currencies": [
+        "AUD",
+        "CAD",
+        "EUR",
+        "GBP",
+        "HKD",
+        "JPY",
+        "NZD",
+        "SGD",
+        "USD"
+      ],
+	"signup_url": "https://stripe.com/"
+}

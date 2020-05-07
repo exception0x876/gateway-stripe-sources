@@ -1,0 +1,10 @@
+{
+    "name": "blesta/stripesources",
+    "description": "Stripe Sources",
+    "license": "MIT",
+    "type": "blesta-gateway-nonmerchant",
+    "require": {
+        "blesta/composer-installer": "~1.0",
+        "stripe/stripe-php": "^7.29"
+    }
+}

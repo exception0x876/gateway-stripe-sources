@@ -1,0 +1,220 @@
+<?php
+if ($this->Html->ifSet($fields)) {
+    foreach ($fields as $key => $value) {
+        $this->Form->fieldHidden($key, $value);
+    }
+}
+?>
+
+
+ <!-- echo '<a href="'.$fields['wechat']['qr_code_url'].'"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data='.$fields['wechat']['qr_code_url'].'" style="width:300px;height:300px;" ></a>'; -->
+
+
+
+
+
+
+<div id="payment-methods">
+
+</div>
+
+<div id="payment-alerts">
+
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="wechatModal" tabindex="-1" role="dialog" aria-labelledby="wechatModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">WeChat Pay</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div id="wechatModalBody" class="modal-body">
+        
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+<?php $this->Form->end();?>
+
+
+<script src="https://js.stripe.com/v3/"></script>
+<script src="https://cdn.jsdelivr.net/npm/davidshimjs-qrcodejs@0.0.2/qrcode.min.js" integrity="sha256-xUHvBjJ4hahBW8qN9gceFBibSFUzbe9PNttUvehITzY=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+
+$(document).ready(function(){
+  var fields = <?php echo json_encode($fields) ?>;
+  var stripe = Stripe(fields.stripe_key);
+
+  var paymentMethods = {
+    alipay: {
+      name: 'Alipay',
+      flow: 'redirect',
+      countries: ['CN', 'HK', 'SG', 'JP'],
+      currencies: [
+        'aud',
+        'cad',
+        'eur',
+        'gbp',
+        'hkd',
+        'jpy',
+        'nzd',
+        'sgd',
+        'usd',
+      ],
+    },
+    wechat: {
+      name: 'WeChat Pay',
+      flow: 'none',
+      countries: ['CN', 'HK', 'SG', 'JP'],
+      currencies: [
+        'aud',
+        'cad',
+        'eur',
+        'gbp',
+        'hkd',
+        'jpy',
+        'nzd',
+        'sgd',
+        'usd',
+      ],
+    },
+  };
+
+  
+  for (const [key, value] of Object.entries(paymentMethods)) {
+    $("#payment-methods").append(`<button type="button" id="pay-${key}" class="btn btn-primary">${value.name}</button>`); 
+   }
+
+   $("#payment-methods button").click(function(e){
+        e.preventDefault();
+
+        var prevButtonContent = $(this).html();
+        $(this).html(`<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>Loading...`);
+        var buttonID = $(this).attr('id');
+        $("#payment-alerts").html("");
+
+        switch (buttonID) {
+        case "pay-wechat":
+            stripe.createSource({
+            type: 'wechat',
+            amount: fields.amount,
+            currency: fields.currency,
+            owner: fields.owner,
+            metadata: fields.metadata
+            }).then(function(result) {
+
+                $(`#${buttonID}`).html(prevButtonContent);
+
+
+                $("#wechatModalBody").html("");
+
+                if (result.error){
+                    $("#wechatModalBody").html(`<div class="alert alert-danger" role="alert">
+                        An error occured.
+                        </div>`);
+                } else {
+                    new QRCode(document.getElementById("wechatModalBody"), {
+                        text: result.source.wechat.qr_code_url,
+                        width: 250,
+                        height: 250,
+                        colorDark : "#000000",
+                        colorLight : "#ffffff",
+                        correctLevel : QRCode.CorrectLevel.L
+                    });
+
+                    $("#wechatModalBody").append(
+                    `<div class="alert alert-info" role="alert">
+                    Scan QR Code in WeChat.
+                        </div>`
+                    );
+
+                    setInterval(function(){ 
+                        stripe
+                            .retrieveSource({
+                                id: result.source.id,
+                                client_secret: result.source.client_secret,
+                            })
+                            .then(function(result) {
+                                if (result.source.status == "consumed"){
+                                  var url = new URL(encodeURI(fields.return_url));
+                                  url.searchParams.append('source', result.source.id,);
+                                  url.searchParams.append('client_secret', result.source.client_secret);
+                                  window.location.href = url;
+                                }
+                            });
+                     }, 3000);
+                    
+                }
+
+                $('#wechatModal').modal('show')
+
+            });
+        
+        break;
+        case "pay-alipay":
+            $(`#${buttonID}`).html(prevButtonContent);
+
+            stripe.createSource({
+            type: 'alipay',
+            amount: fields.amount,
+            currency: fields.currency,
+            owner: fields.owner,
+            metadata: fields.metadata,
+            redirect: {
+                return_url: encodeURI(fields.return_url),
+            },
+            }).then(function(result) {
+                if (result.error){
+                    $("#payment-alerts").html(`<div class="alert alert-danger" role="alert">
+                        An error occured.
+                        </div>`);
+                } else {
+                    window.location.href = result.source.redirect.url;
+                }
+            });
+
+            break;
+        default:
+            break;
+            }
+        });
+    });
+</script>
+
+<style>
+#wechatModalBody img{
+    margin: auto;
+}
+
+#wechatModalBody .alert{
+    margin-top: 5px;
+    text-align: center;
+}
+
+#payment-methods button{
+    margin-right: 8px;
+}
+
+
+#pay-alipay{
+    background-color: #0e9dec;
+}
+
+
+#pay-wechat{
+    background-color: #7bb32e;
+}
+
+</style>
