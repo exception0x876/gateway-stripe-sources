@@ -91,6 +91,13 @@ class StripeSources extends NonmerchantGateway
                     'rule' => [[$this, 'validateConnection']],
                     'message' => Language::_('StripeSources.!error.secret_key.valid', true)
                 ]
+            ],
+            'signing_key' => [
+                'empty' => [
+                    'rule' => 'isEmpty',
+                    'negate' => true,
+                    'message' => Language::_('StripeSources.!error.signing_key.empty', true)
+                ],
             ]
         ];
 
@@ -176,7 +183,7 @@ class StripeSources extends NonmerchantGateway
                 
         try {
             $event = \Stripe\Webhook::constructEvent(
-                $payload, $sig_header, "whsec_6CcefumehVilUpCrSdJ4jO32IhH1j25o"
+                $payload, $sig_header, $this->meta['signing_key']
             );
         } catch(\UnexpectedValueException $e) {
             // Invalid payload
